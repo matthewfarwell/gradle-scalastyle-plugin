@@ -21,6 +21,8 @@ import org.scalastyle.ScalastyleChecker
 import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.TextOutput
 import org.scalastyle.XmlOutput
+import org.scalastyle.Directory
+import org.scalastyle.FileSpec
 
 /**
  * @author Muhammad Ashraf
@@ -38,7 +40,6 @@ class ScalaStyleTask extends SourceTask {
     Boolean quiet = true
     Boolean includeTestSourceDirectory = false
     String inputEncoding = "UTF-8"
-    ScalaStyleUtils scalaStyleUtils = new ScalaStyleUtils()
     String testSource
     FileTree testSourceDir
 
@@ -54,8 +55,8 @@ class ScalaStyleTask extends SourceTask {
             try {
                 def startMs = System.currentTimeMillis()
                 def configuration = ScalastyleConfiguration.readFromXml(configLocation)
-                def fileToProcess = scalaStyleUtils.getFilesToProcess(source.getFiles().toList(), testSourceDir.getFiles().toList(), inputEncoding, includeTestSourceDirectory)
-                def messages = new ScalastyleChecker().checkFiles(configuration, fileToProcess)
+                def fileToProcess = getFilesToProcess(source.getFiles().toList(), testSourceDir.getFiles().toList(), inputEncoding, includeTestSourceDirectory)
+                def messages = new ScalastyleChecker().checkFilesAsJava(configuration, fileToProcess)
                 def outputResult = new TextOutput(verbose, quiet).output(messages)
 
                 getLogger().debug("Saving to outputFile={}", project.file(outputFile).getCanonicalPath());
@@ -80,6 +81,20 @@ class ScalaStyleTask extends SourceTask {
         }
     }
 
+    private List<FileSpec> getFilesToProcess(List<File> sourceFiles, List<File> testFiles, String encoding, boolean includeTestSourceDirectory) {
+      List<FileSpec> x = new ArrayList<FileSpec>(getFiles(sourceFiles, encoding))
+
+      if (includeTestSourceDirectory) {
+        x.addAll(getFiles(testFiles, encoding))        
+      }
+
+      x
+    }
+
+    private List<FileSpec> getFiles(List<File> file, String encoding) {
+      Directory.getFilesAsJava(scala.Option.apply(encoding), file)
+    }
+  
     private void processViolations(int violations) {
         if (violations > 0) {
             if (failOnViolation) {
