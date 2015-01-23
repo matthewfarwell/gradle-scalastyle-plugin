@@ -23,6 +23,8 @@ import org.scalastyle.TextOutput
 import org.scalastyle.XmlOutput
 import org.scalastyle.Directory
 import org.scalastyle.FileSpec
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
 
 /**
  * @author Muhammad Ashraf
@@ -57,10 +59,11 @@ class ScalaStyleTask extends SourceTask {
                 def configuration = ScalastyleConfiguration.readFromXml(configLocation)
                 def fileToProcess = getFilesToProcess(source.getFiles().toList(), testSourceDir.getFiles().toList(), inputEncoding, includeTestSourceDirectory)
                 def messages = new ScalastyleChecker().checkFilesAsJava(configuration, fileToProcess)
-                def outputResult = new TextOutput(verbose, quiet).output(messages)
+                def config = ConfigFactory.load()
 
+                def outputResult = new TextOutput(config, verbose, quiet).output(messages)
                 getLogger().debug("Saving to outputFile={}", project.file(outputFile).getCanonicalPath());
-                XmlOutput.save(outputFile, outputEncoding, messages)
+                XmlOutput.save(config, outputFile, outputEncoding, messages)
 
                 def stopMs = System.currentTimeMillis()
                 if (!quiet) {
@@ -82,13 +85,15 @@ class ScalaStyleTask extends SourceTask {
     }
 
     private List<FileSpec> getFilesToProcess(List<File> sourceFiles, List<File> testFiles, String encoding, boolean includeTestSourceDirectory) {
-      List<FileSpec> x = new ArrayList<FileSpec>(getFiles(sourceFiles, encoding))
+      getLogger().debug("getting files from " + sourceFiles)
+      List<FileSpec> files = new ArrayList<FileSpec>(getFiles(sourceFiles, encoding))
 
       if (includeTestSourceDirectory) {
-        x.addAll(getFiles(testFiles, encoding))        
+        getLogger().debug("getting files from " + testFiles)
+        files.addAll(getFiles(testFiles, encoding))        
       }
 
-      x
+      files
     }
 
     private List<FileSpec> getFiles(List<File> file, String encoding) {

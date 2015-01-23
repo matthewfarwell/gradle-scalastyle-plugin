@@ -1,12 +1,17 @@
 # Scala Style Gradle Plugin
 
+### IMPORTANT
+This project is not actively maintained on anymore. Go to
+ https://github.com/ngbinh/gradle-scalastyle-plugin for Gradle Scala Style plugin
+###
+
 ### Instructions
 
 ```
 maven repo: http://dl.bintray.com/releashaus/release
 groupId: org.github.mansur.scalastyle
 artifactId:  gradle-scalastyle-plugin_2.10
-version: 0.4.1
+version: 0.5.0
 ```
 
 ```groovy
@@ -16,7 +21,7 @@ version: 0.4.1
 Add following dependencies to your buildScript
 
 ```groovy
-     classpath "org.github.mansur.scalastyle:gradle-scalastyle-plugin_2.10:0.4.1"
+     classpath "org.github.mansur.scalastyle:gradle-scalastyle-plugin_2.10:0.5.0"
 ```
 
 Configure the plugin
@@ -57,7 +62,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.github.mansur.scalastyle:gradle-scalastyle-plugin_2.10:0.4.1'
+    classpath 'org.github.mansur.scalastyle:gradle-scalastyle-plugin_2.10:0.5.0'
   }
 
 }
